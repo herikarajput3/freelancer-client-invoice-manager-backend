@@ -8,11 +8,13 @@ const errorHandler = (error, req, res, next) => {
     let statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR;
     let message = "Internal Server Error";
     let code = "INTERNAL_SERVER_ERROR";
+    let details;
 
     if (error instanceof AppError) {
         statusCode = error.statusCode;
         message = error.message;
         code = error.code;
+        details = error.details;
     } else {
         logger.error(error);
     }
@@ -24,6 +26,7 @@ const errorHandler = (error, req, res, next) => {
         data: null,
         meta: {
             code,
+            ...(details && { details }),
             ...(config.nodeEnv !== "production" && {
                 stack: error.stack,
             }),
