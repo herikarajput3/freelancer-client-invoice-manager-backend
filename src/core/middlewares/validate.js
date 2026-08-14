@@ -20,16 +20,15 @@ const validate = (schemas) => {
             next();
         } catch (error) {
             if (error instanceof ZodError) {
-                const details = error.issues.map((issue) => ({
-                    path: issue.path,
+                const errors = error.issues.map((issue) => ({
+                    field: issue.path.join("."),
                     message: issue.message,
                 }));
 
                 return next(
                     new ValidationError(
-                        "Request validation failed.",
-                        "VALIDATION_ERROR",
-                        details
+                        "Validation failed.",
+                        errors
                     )
                 );
             }
