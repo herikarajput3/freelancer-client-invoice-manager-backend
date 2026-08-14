@@ -4,15 +4,14 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
 import requestLogger from "./requestLogger.js";
-import notFound from "./notFound.js";
-import errorHandler from "./errorHandler.js";
+import config from "../config/index.js";
 
 const setupGlobalMiddleware = (app) => {
     app.use(helmet());
 
     app.use(
         cors({
-            origin: true,
+            origin: config.cors.origin,
             credentials: true,
         })
     );
@@ -25,8 +24,8 @@ const setupGlobalMiddleware = (app) => {
 
     app.use(
         rateLimit({
-            windowMs: 15 * 60 * 1000,
-            limit: 100,
+            windowMs: config.rateLimit.windowMs,
+            limit: config.rateLimit.max,
             standardHeaders: "draft-8",
             legacyHeaders: false,
         })
