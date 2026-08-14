@@ -1,12 +1,9 @@
 const getPagination = (page = 1, limit = 20) => {
-    const currentPage = Math.max(Number(page) || 1, 1);
-    const pageSize = Math.max(Number(limit) || 20, 1);
-
-    const skip = (currentPage - 1) * pageSize;
+    const skip = (page - 1) * limit;
 
     return {
-        page: currentPage,
-        limit: pageSize,
+        page,
+        limit,
         skip,
     };
 };
