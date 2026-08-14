@@ -3,6 +3,11 @@ const config = {
 
     port: process.env.PORT,
 
+    rateLimit: {
+        windowMs: 15 * 60 * 1000,
+        max: 100,
+    },
+
     database: {
         uri: process.env.MONGODB_URI,
     },
