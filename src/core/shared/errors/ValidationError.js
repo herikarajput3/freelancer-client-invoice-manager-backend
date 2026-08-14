@@ -4,16 +4,15 @@ import AppError from "./AppError.js";
 class ValidationError extends AppError {
     constructor(
         message = "Validation failed.",
-        code = "VALIDATION_ERROR",
-        details = []
+        errors = []
     ) {
         super({
             message,
             statusCode: HTTP_STATUS.UNPROCESSABLE_ENTITY,
-            code,
+            code: "VALIDATION_ERROR",
         });
 
-        this.details = details;
+        this.errors = errors;
     }
 }
 
