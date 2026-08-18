@@ -1,7 +1,34 @@
-const config = {
-    nodeEnv: process.env.NODE_ENV,
+import { z } from "zod";
 
-    port: process.env.PORT,
+const envSchema = z.object({
+    NODE_ENV: z
+        .enum(["development", "test", "production"])
+        .default("development"),
+
+    PORT: z.coerce
+        .number()
+        .int()
+        .positive()
+        .default(5000),
+
+    MONGODB_URI: z
+        .string()
+        .trim()
+        .min(1, "MONGODB_URI is required"),
+
+    JWT_SECRET: z.string().optional(),
+
+    JWT_EXPIRES_IN: z.string().optional(),
+
+    CORS_ORIGIN: z.string().optional(),
+});
+
+const env = envSchema.parse(process.env);
+
+const config = {
+    nodeEnv: env.NODE_ENV,
+
+    port: env.PORT,
 
     rateLimit: {
         windowMs: 15 * 60 * 1000,
@@ -9,16 +36,16 @@ const config = {
     },
 
     database: {
-        uri: process.env.MONGODB_URI,
+        uri: env.MONGODB_URI,
     },
 
     jwt: {
-        secret: process.env.JWT_SECRET,
-        expiresIn: process.env.JWT_EXPIRES_IN,
+        secret: env.JWT_SECRET,
+        expiresIn: env.JWT_EXPIRES_IN,
     },
 
     cors: {
-        origin: process.env.CORS_ORIGIN,
+        origin: env.CORS_ORIGIN,
     },
 };
 
