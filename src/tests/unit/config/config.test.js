@@ -19,7 +19,7 @@ describe("configuration", () => {
     });
 
     it("loads valid configuration", async () => {
-        const { default: config } = await import("../../core/config/index.js");
+        const { default: config } = await import("../../../core/config/index.js");
 
         expect(config.nodeEnv).toBe("test");
         expect(config.port).toBe(5000);
@@ -31,7 +31,7 @@ describe("configuration", () => {
     it("uses the default port when PORT is not provided", async () => {
         delete process.env.PORT;
 
-        const { default: config } = await import("../../core/config/index.js");
+        const { default: config } = await import("../../../core/config/index.js");
 
         expect(config.port).toBe(5000);
     });
@@ -40,7 +40,7 @@ describe("configuration", () => {
         delete process.env.MONGODB_URI;
 
         await expect(
-            import("../../core/config/index.js"),
+            import("../../../core/config/index.js"),
         ).rejects.toThrow();
     });
 
@@ -48,7 +48,7 @@ describe("configuration", () => {
         process.env.PORT = "invalid";
 
         await expect(
-            import("../../core/config/index.js"),
+            import("../../../core/config/index.js"),
         ).rejects.toThrow();
     });
 });
