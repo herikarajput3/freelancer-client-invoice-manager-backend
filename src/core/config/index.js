@@ -19,7 +19,9 @@ const envSchema = z.object({
 
     JWT_SECRET: z.string().optional(),
 
-    JWT_EXPIRES_IN: z.string().optional(),
+    JWT_ACCESS_EXPIRES_IN: z.string().optional(),
+
+    JWT_REFRESH_EXPIRES_IN: z.string().optional(),
 
     CORS_ORIGIN: z.string().optional(),
 });
@@ -42,7 +44,8 @@ const config = {
 
     jwt: {
         secret: env.JWT_SECRET,
-        expiresIn: env.JWT_EXPIRES_IN,
+        accessExpiresIn: env.JWT_ACCESS_EXPIRES_IN,
+        refreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN,
     },
 
     cors: {
