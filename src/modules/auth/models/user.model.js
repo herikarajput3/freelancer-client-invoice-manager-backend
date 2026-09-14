@@ -18,7 +18,9 @@ const userSchema = new mongoose.Schema(
 
         businessProfileId: {
             type: mongoose.Schema.Types.ObjectId,
+            ref: "BusinessProfile",
             required: true,
+            unique: true,
         },
     },
     {
