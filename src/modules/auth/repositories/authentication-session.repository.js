@@ -1,9 +1,12 @@
 import AuthenticationSession from "../models/authentication-session.model.js";
 
-const createSession = (sessionData, options = {}) =>
-    AuthenticationSession.create([sessionData], options).then(
-        ([session]) => session,
+const createSession = async (sessionData, options = {}) => {
+    const [session] = await AuthenticationSession.create(
+        [sessionData],
+        options,
     );
+    return session;
+};
 
 const findByRefreshTokenHash = (refreshTokenHash) =>
     AuthenticationSession.findOne({ refreshTokenHash }).select(

@@ -32,13 +32,16 @@ describe("Business Profile Repository", () => {
                 ...profileData,
             };
 
-            mockBusinessProfile.create.mockResolvedValue(createdProfile);
+            mockBusinessProfile.create.mockResolvedValue([
+                createdProfile,
+            ]);
 
             const result =
                 await businessProfileRepository.createProfile(profileData);
 
             expect(mockBusinessProfile.create).toHaveBeenCalledWith(
-                profileData,
+                [profileData],
+                {},
             );
             expect(result).toEqual(createdProfile);
         });

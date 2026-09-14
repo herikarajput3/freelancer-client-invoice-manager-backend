@@ -4,6 +4,7 @@ import businessProfileService from "../../business-profile/services/business-pro
 import authenticationSessionRepository from "../repositories/authentication-session.repository.js";
 import userRepository from "../repositories/user.repository.js";
 import passwordService from "./password.service.js";
+import sessionTokenService from "./session-token.service.js";
 import tokenService from "./token.service.js";
 
 const register = async ({
@@ -17,10 +18,11 @@ const register = async ({
         let registrationResult;
 
         await session.withTransaction(async () => {
-            const existingUser = await userRepository.findByEmail(
-                email,
-                { session },
-            );
+            const existingUser =
+                await userRepository.findByEmail(
+                    email,
+                    { session },
+                );
 
             if (existingUser) {
                 const error = new Error(
@@ -28,6 +30,7 @@ const register = async ({
                 );
 
                 error.code = "USER_ALREADY_EXISTS";
+
                 throw error;
             }
 
@@ -38,7 +41,6 @@ const register = async ({
                 await businessProfileService.createProfile(
                     {
                         businessName,
-                        ownerName: businessName,
                         email,
                     },
                     { session },
@@ -54,30 +56,31 @@ const register = async ({
                 { session },
             );
 
-            const refreshToken =
-                tokenService.generateRefreshToken({
-                    userId: user._id.toString(),
-                });
-
             const accessToken =
                 tokenService.generateAccessToken({
                     userId: user._id.toString(),
                 });
 
-            const decodedRefreshToken =
-                tokenService.verifyAccessToken(
-                    accessToken,
+            const refreshToken =
+                tokenService.generateRefreshToken({
+                    userId: user._id.toString(),
+                });
+
+            const refreshTokenHash =
+                sessionTokenService.hashSessionToken(
+                    refreshToken,
                 );
 
-            const refreshTokenExpiresAt = new Date(
-                decodedRefreshToken.exp * 1000,
-            );
+            const expiresAt =
+                tokenService.getTokenExpirationDate(
+                    refreshToken,
+                );
 
             await authenticationSessionRepository.createSession(
                 {
                     userId: user._id,
-                    refreshTokenHash: refreshToken,
-                    expiresAt: refreshTokenExpiresAt,
+                    refreshTokenHash,
+                    expiresAt,
                 },
                 { session },
             );
@@ -88,7 +91,7 @@ const register = async ({
                 refreshToken,
             };
         });
-        
+
         return registrationResult;
     } finally {
         await session.endSession();

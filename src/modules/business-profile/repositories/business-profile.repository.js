@@ -1,9 +1,13 @@
 import BusinessProfile from "../models/business-profile.model.js";
 
-const createProfile = (profileData, options = {}) =>
-    BusinessProfile.create([profileData], options).then(
-        ([profile]) => profile,
+const createProfile = async (profileData, options = {}) => {
+    const [profile] = await BusinessProfile.create(
+        [profileData],
+        options,
     );
+
+    return profile;
+};
 
 const findById = (profileId) =>
     BusinessProfile.findById(profileId);

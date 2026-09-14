@@ -41,7 +41,9 @@ describe("Business Profile Service", () => {
 
             expect(
                 mockBusinessProfileRepository.createProfile,
-            ).toHaveBeenCalledWith(profileData);
+            ).toHaveBeenCalledWith(
+                profileData,
+            );
 
             expect(result).toEqual(createdProfile);
         });
