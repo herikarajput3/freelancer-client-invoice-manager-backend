@@ -1,7 +1,10 @@
 import businessProfileRepository from "../repositories/business-profile.repository.js";
 
-const createProfile = (profileData) =>
-    businessProfileRepository.createProfile(profileData);
+const createProfile = (profileData, options = {}) =>
+    businessProfileRepository.createProfile(
+        profileData,
+        options,
+    );
 
 const getProfile = (profileId) =>
     businessProfileRepository.findById(profileId);

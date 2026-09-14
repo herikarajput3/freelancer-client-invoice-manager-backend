@@ -1,7 +1,9 @@
 import BusinessProfile from "../models/business-profile.model.js";
 
-const createProfile = (profileData) =>
-    BusinessProfile.create(profileData);
+const createProfile = (profileData, options = {}) =>
+    BusinessProfile.create([profileData], options).then(
+        ([profile]) => profile,
+    );
 
 const findById = (profileId) =>
     BusinessProfile.findById(profileId);
