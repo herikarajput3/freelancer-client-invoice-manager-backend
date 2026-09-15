@@ -1,7 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
+import authRoutes from "./modules/auth/routes/auth.routes.js";
 
 const app = express();
+app.use("/api/v1/auth", authRoutes);
 
 app.get("/health", (req, res) => {
     const databaseHealthy =
