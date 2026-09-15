@@ -189,7 +189,7 @@ describe("Registration Service", () => {
 
         expect(result).toEqual({
             user: {
-                _id: "user-id",
+                id: "user-id",
                 email: registrationData.email,
                 businessProfileId: "profile-id",
             },
