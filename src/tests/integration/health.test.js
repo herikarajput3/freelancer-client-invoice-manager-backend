@@ -1,15 +1,23 @@
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockMongoose = {
+const mockMongoose = vi.hoisted(() => ({
     connection: {
         readyState: 1,
     },
-};
-
-vi.mock("mongoose", () => ({
-    default: mockMongoose,
 }));
+
+vi.mock("mongoose", async () => {
+    const actual = await vi.importActual("mongoose");
+
+    return {
+        ...actual,
+        default: {
+            ...actual.default,
+            connection: mockMongoose.connection,
+        },
+    };
+});
 
 const { default: app } = await import("../../app.js");
 
