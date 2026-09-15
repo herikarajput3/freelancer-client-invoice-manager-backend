@@ -53,6 +53,9 @@ describe("Auth Controller", () => {
 
         const req = {
             body: requestBody,
+            validated: {
+                body: requestBody,
+            },
         };
 
         const res = {};
@@ -70,9 +73,12 @@ describe("Auth Controller", () => {
 
         expect(mocks.sendResponse).toHaveBeenCalledWith(
             res,
-            201,
-            "Registration successful",
-            registrationResult,
+            {
+                statusCode: 201,
+                success: true,
+                message: "Registration successful",
+                data: registrationResult,
+            },
         );
 
         expect(next).not.toHaveBeenCalled();
@@ -83,6 +89,9 @@ describe("Auth Controller", () => {
 
         const req = {
             body: {},
+            validated: {
+                body: {},
+            },
         };
 
         const res = {};

@@ -8,7 +8,9 @@ const router = Router();
 
 router.post(
     "/register",
-    validate(registrationSchema),
+    validate({
+        body: registrationSchema,
+    }),
     authController.register,
 );
 

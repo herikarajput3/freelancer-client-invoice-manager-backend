@@ -4,15 +4,15 @@ import sendResponse from "../../../core/responses/sendResponse.js";
 const register = async (req, res, next) => {
     try {
         const result = await registrationService.register(
-            req.body,
+            req.validated.body,
         );
 
-        return sendResponse(
-            res,
-            201,
-            "Registration successful",
-            result,
-        );
+        return sendResponse(res, {
+            statusCode: 201,
+            success: true,
+            message: "Registration successful",
+            data: result,
+        });
     } catch (error) {
         return next(error);
     }
