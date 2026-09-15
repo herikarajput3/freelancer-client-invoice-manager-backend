@@ -86,7 +86,11 @@ const register = async ({
             );
 
             registrationResult = {
-                user,
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    businessProfileId: user.businessProfileId,
+                },
                 accessToken,
                 refreshToken,
             };
