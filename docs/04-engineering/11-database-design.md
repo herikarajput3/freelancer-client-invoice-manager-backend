@@ -205,6 +205,14 @@ This dependency view complements the detailed collection relationship diagram pr
 
 ## 3.6 Collection Inventory
 
+User
+  ↓
+Workspace
+  ↓
+Business Profile
+  ↓
+Business Data
+
 | Collection           | Aggregate         | Embedded Documents                                     | References                                  |
 | -------------------- | ----------------- | ------------------------------------------------------ | ------------------------------------------- |
 | `business_profiles`  | Business Profile  | Address, Branding, Bank Details, Invoice Defaults      | None                                        |

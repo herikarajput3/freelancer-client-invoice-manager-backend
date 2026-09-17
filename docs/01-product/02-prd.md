@@ -6,12 +6,9 @@
 
 ## 1. Executive Summary
 
-The Freelancer Client & Invoice Manager is a single-user web SaaS
-application that helps independent software developers run their
-freelance business with confidence. It provides one trusted source of
-truth for clients, invoices, payments, relationship history, and
-business activity. The product is a freelance business management
-application, not a full accounting or bookkeeping solution.
+The Freelancer Client & Invoice Manager is a web SaaS application
+designed around a single-user workspace model. Each workspace is operated
+by one freelancer and represents one freelancer business.
 
 ## 2. Product Vision
 
@@ -36,7 +33,7 @@ requires attention.
 - Independent software developers
 - Freelancers managing 3--20 active clients
 - Global audience
-- Single-user web application
+- Single-user workspace model
 - Supports individual and company clients
 
 ## 6. Product Goals

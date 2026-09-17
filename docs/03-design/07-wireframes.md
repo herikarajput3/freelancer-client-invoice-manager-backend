@@ -967,7 +967,7 @@ A searchable and filterable table listing reminders with their due dates and sta
 
 ### Interaction Notes
 
-- Selecting a reminder opens its details or editing screen.
+- Selecting a reminder opens the Reminder Details screen. Pending reminders can be edited; Completed and Cancelled reminders are read-only.
 - Completed reminders remain available for historical reference.
 - Filters help users focus on pending or overdue reminders.
 

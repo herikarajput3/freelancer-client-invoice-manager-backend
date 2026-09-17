@@ -11,6 +11,17 @@
 | Prepared By  | Product Team                        |
 | Last Updated | July 2026                           |
 
+### Business Event, Timeline Event, Audit Log, and Application Log
+
+These concepts have different purposes:
+
+- Business Event: A meaningful occurrence in the business domain, such as Invoice Issued or Payment Recorded.
+- Timeline Event: A user-facing historical representation of a business event.
+- Audit Log: A security or operational record describing who performed an action, on which resource, and when.
+- Application Log: Technical diagnostic information used for debugging and system operations.
+
+Timeline Events must not be treated as security audit logs or application logs.
+
 # 1. Purpose
 
 The Business Rules Specification (BRS) defines the business behavior governing the Freelancer Client & Invoice Manager.
@@ -287,9 +298,10 @@ Every Client, Invoice, and Payment belongs to a business.
 
 **Rule**
 
-The Business Profile owns all business data created within the workspace.
+The Business Profile defines the business-data ownership boundary
+for records created within the workspace.
 
-This includes:
+This boundary includes:
 
 - Clients
 - Invoices
@@ -427,7 +439,10 @@ These events may generate Timeline Events.
 
 A Client represents a person or organization that receives services and invoices from the Business Profile.
 
-Clients are the primary business relationships managed by the application and act as the ownership point for invoices, payments, relationship notes, and other client-specific business activities.
+Clients are the primary business relationships managed by the application.
+Invoices, payments, relationship notes, reminders, and other client-related
+activities may be associated with a Client while remaining owned and managed
+by their respective domain modules.
 
 ## 14.2 Responsibilities
 
@@ -435,7 +450,8 @@ The Client is responsible for:
 
 - Maintaining client identity.
 - Storing client contact information.
-- Acting as the owner of invoices.
+- Serving as the business relationship associated with invoices and other
+  client-related activities.
 - Supporting long-term business relationships.
 - Maintaining client-specific business preferences.
 
@@ -708,8 +724,12 @@ The Invoice lifecycle consists of the following business states:
 2. Issued
 3. Partially Paid
 4. Paid
-5. Overdue
-6. Cancelled
+5. Cancelled
+
+Overdue is a derived condition, not a persisted lifecycle state.
+
+An Invoice is considered Overdue when its Due Date has passed and its
+Outstanding Balance is greater than zero.
 
 Issued invoices remain part of the permanent business history.
 
@@ -852,9 +872,10 @@ An Invoice becomes Paid when the Outstanding Balance reaches zero.
 
 **Rule**
 
-If an Invoice is not fully paid by its Due Date, it becomes Overdue.
+An Invoice is considered Overdue when its Due Date has passed and its
+Outstanding Balance is greater than zero.
 
-Partial payment does not prevent an Invoice from becoming Overdue when an outstanding balance remains.
+Overdue is a derived condition and is not a separate persisted lifecycle state.
 
 ### BR-INV-014 — Invoice Cancellation
 
@@ -882,13 +903,12 @@ Issued invoices must always be preserved.
 | Draft          | Delete                 | Deleted        |
 | Issued         | Record Partial Payment | Partially Paid |
 | Issued         | Record Full Payment    | Paid           |
-| Issued         | Due Date Passes        | Overdue        |
 | Issued         | Cancel                 | Cancelled      |
 | Partially Paid | Additional Payment     | Partially Paid |
 | Partially Paid | Remaining Balance Paid | Paid           |
-| Partially Paid | Due Date Passes        | Overdue        |
-| Overdue        | Partial Payment        | Overdue        |
-| Overdue        | Remaining Balance Paid | Paid           |
+
+Note: Overdue is derived from Due Date and Outstanding Balance and does not
+represent a persisted state transition.
 
 ### Forbidden State Transitions
 
@@ -997,8 +1017,8 @@ Payments provide the official record of financial settlements and determine the 
 The Payment is responsible for:
 
 - Recording money received.
-- Reducing the outstanding invoice balance.
-- Updating invoice payment status.
+- Applying recorded payments to the associated Invoice financial state.
+- Triggering recalculation of the Invoice Outstanding Balance and payment status.
 - Preserving financial payment history.
 
 The Payment is **not** responsible for:
@@ -1071,6 +1091,12 @@ Total recorded Payments must never exceed the Invoice Total.
 Incorrect Payments must be corrected by voiding the original Payment and recording a replacement.
 
 Historical Payment records must never be removed.
+
+When a Payment is voided, the associated Invoice financial state must be
+recalculated using the remaining Recorded Payments.
+
+The Invoice Outstanding Balance and payment status must reflect the
+remaining valid payments.
 
 ---
 
@@ -1362,7 +1388,7 @@ Completed and Cancelled Reminders remain in history.
 
 ## 18.7 Edge Cases
 
-- Reminder becomes overdue.
+- A Reminder is considered overdue when its status is Pending and its Due Date has passed. Overdue is a derived condition and is not a separate lifecycle state.
 - Linked Invoice becomes Paid before Reminder completion.
 - Linked Client archived.
 - Reminder completed after Due Date.

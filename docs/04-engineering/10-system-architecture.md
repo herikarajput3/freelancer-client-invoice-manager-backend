@@ -101,7 +101,7 @@ The architecture is primarily driven by the following factors:
 
 ### Business Drivers
 
-- Single-user freelancer workflow
+- Single-user workspace model
 - Efficient client and invoice management
 - Accurate financial record keeping
 - Simple operational workflow
@@ -180,7 +180,7 @@ The architectural boundary intentionally separates business logic from infrastru
           ┌───────────┴───────────┐
           │                       │
           ▼                       ▼
-     PostgreSQL            External Services
+     MongoDB Atlas       External Services
                          • Email Provider
                          • File Storage
 ```
@@ -237,7 +237,8 @@ The architecture intentionally avoids unnecessary complexity while preserving cl
 
 The system follows a layered architecture within each business module.
 
-Each layer has a clearly defined responsibility and communicates only with adjacent architectural layers.
+Dependencies should point inward toward the application's business rules.
+Presentation depends on Application, and Application depends on Domain abstractions. Infrastructure implements interfaces or ports defined by inner layers. Inner layers must not depend directly on Infrastructure implementations.
 
 ```text
 Presentation Layer
@@ -482,22 +483,22 @@ Manages the complete invoice lifecycle.
 
 ### Purpose
 
-Manages invoice payments and outstanding balances.
+Manages invoice payments and their effect on invoice financial state.
 
 ### Responsibilities
 
 - Payment recording
 - Payment history
-- Outstanding balance calculation
 - Payment validation
-- Payment completion tracking
+- Payment lifecycle management
+- Requesting invoice financial state updates after payment changes
 
 ### Owns
 
 - Payment
 - Payment History
 - Payment Method
-- Outstanding Balance
+- Payment Lifecycle
 
 ### Depends On
 

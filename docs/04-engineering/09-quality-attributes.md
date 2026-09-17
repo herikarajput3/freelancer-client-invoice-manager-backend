@@ -519,11 +519,14 @@ The system should:
 
 The application should:
 
-- Enforce role-based access control (RBAC).
-- Allow users to access only resources they are authorized to use.
-- Protect sensitive operations through permission validation.
-- Prevent privilege escalation and unauthorized data access.
-- Validate permissions on every protected request.
+- Enforce authenticated user access to protected resources.
+- Ensure users can access only resources belonging to their authorized workspace.
+- Protect sensitive operations through ownership and permission validation.
+- Prevent unauthorized cross-workspace data access.
+- Validate authorization on every protected request.
+
+Role-based access control (RBAC) is outside the MVP scope and may be introduced
+in a future multi-user collaboration model.
 
 ### 10.4 Data Protection
 

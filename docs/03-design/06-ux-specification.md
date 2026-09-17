@@ -437,8 +437,9 @@ The Screen Catalog provides a complete inventory of all screens included in the 
 | SCR-009 | Record Payment           | Invoices       | Record partial or full invoice payments.                 |
 | SCR-010 | Reminder List            | Reminders      | Browse and manage reminders.                             |
 | SCR-011 | Create Reminder          | Reminders      | Create reminders linked to clients or invoices.          |
-| SCR-012 | Timeline                 | Timeline       | Review chronological business activity.                  |
-| SCR-013 | Business Profile         | Settings       | Configure business information and application defaults. |
+| SCR-012 | Reminder Details          | Reminders      | View reminder information and edit a Pending reminder.
+| SCR-013 | Timeline                 | Timeline       | Review chronological business activity.                  |
+| SCR-014 | Business Profile         | Settings       | Configure business information and application defaults. |
 
 ## Module Overview
 

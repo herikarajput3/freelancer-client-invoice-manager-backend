@@ -34,6 +34,22 @@ information.
 **Notification** informs the freelancer about important business events
 that require attention, such as overdue invoices or upcoming reminders.
 
+### Ownership Hierarchy
+
+The MVP uses the following ownership hierarchy:
+
+User
+  ↓
+Workspace
+  ↓
+Business Profile
+  ↓
+Business Data
+
+Each User operates one Workspace.
+Each Workspace contains one Business Profile.
+Business records belong to the Business Profile within that Workspace.
+
 ## Business Relationships
 
 The Business Profile owns all business data within a single workspace.
