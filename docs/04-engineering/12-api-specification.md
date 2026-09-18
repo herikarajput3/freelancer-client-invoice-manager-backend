@@ -170,11 +170,19 @@ Content-Type: application/json
 
 ## 2.6 Stateless Communication
 
-The API is stateless.
+The API follows a stateless request-processing model for authenticated API requests.
 
-Each request must contain all information necessary for authentication, authorization, validation, and processing.
+Access-token authentication does not require server-side session state to be loaded for each request. The access token contains the claims required to establish the authenticated user context.
 
-No client session state is stored on the server between requests.
+Refresh-token authentication uses server-side persisted session state.
+
+Refresh-token sessions are stored in the `authentication_sessions` collection and contain the hashed refresh token, expiration information, and revocation state.
+
+Therefore:
+
+- Access-token authenticated requests are processed statelessly.
+- Refresh-token lifecycle management uses persisted server-side session state.
+- Authentication session state is managed exclusively by the Authentication Module.
 
 ## 2.7 Consistent Resource Structure
 
@@ -330,9 +338,9 @@ Failed requests return a consistent error structure.
 
 ## 3.4 Validation Error Format
 
-When multiple validation errors occur, the API returns all detected errors in a single response.
+Validation errors return HTTP `422 Unprocessable Entity`.
 
-Example
+The response contains an `errors` array describing the fields that failed validation.
 
 ```json
 {
@@ -340,14 +348,8 @@ Example
   "message": "Validation failed.",
   "errors": [
     {
-      "field": "name",
-      "code": "REQUIRED",
-      "message": "Client name is required."
-    },
-    {
       "field": "email",
-      "code": "INVALID_EMAIL",
-      "message": "Please enter a valid email address."
+      "message": "Invalid email address."
     }
   ]
 }
@@ -539,11 +541,102 @@ Examples of protected resources include:
 
 The following endpoints are accessible without authentication:
 
+- Register
 - Sign In
 - Refresh Access Token
 - Health Check (if implemented)
 
 Additional public endpoints, if introduced in future versions, will be documented individually.
+
+## 4.5 Register
+
+### Endpoint
+
+```http
+POST /api/v1/auth/register
+```
+
+### Authentication
+
+**Public endpoint**
+
+Authentication is not required.
+
+### Purpose
+
+Creates a new user account and its associated Business Profile.
+
+### Request Body
+
+```json
+{
+  "email": "freelancer@example.com",
+  "password": "securepassword",
+  "businessName": "Acme Studio"
+}
+```
+
+### Required Fields
+
+| Field          | Type   | Required |
+| -------------- | ------ | -------- |
+| `email`        | String | Yes      |
+| `password`     | String | Yes      |
+| `businessName` | String | Yes      |
+
+### Validation
+
+The request must satisfy the registration validation rules defined by the Authentication Module.
+
+Invalid requests return a validation error response.
+
+### Successful Response
+
+**HTTP 201 Created**
+
+```json
+{
+  "success": true,
+  "message": "Registration successful",
+  "data": {
+    "user": {
+      "id": "user-id",
+      "email": "freelancer@example.com",
+      "businessProfileId": "profile-id"
+    },
+    "accessToken": "access-token",
+    "refreshToken": "refresh-token"
+  }
+}
+```
+
+### Business Behavior
+
+Registration performs the following operations:
+
+1. Validates the registration input.
+2. Verifies that the email address is not already registered.
+3. Hashes the user's password.
+4. Creates the Business Profile.
+5. Creates the User account.
+6. Associates the User with the Business Profile.
+7. Creates an authentication session.
+8. Generates an access token.
+9. Generates a refresh token.
+
+User creation and Business Profile creation must maintain consistency so that a partially completed registration does not leave orphaned authentication or business data.
+
+### Duplicate Account
+
+If an account already exists for the supplied email address, registration is rejected.
+
+### Error Responses
+
+| Status | Condition               |
+| ------ | ----------------------- |
+| `422`  | Validation failed       |
+| `409`  | Account already exists  |
+| `500`  | Unexpected server error |
 
 ## 4.5 Access Token
 
@@ -561,14 +654,67 @@ Clients should never modify the contents of the token.
 
 ## 4.6 Refresh Token
 
-The Refresh Token is used to obtain a new Access Token without requiring the user to sign in again.
+### Purpose
 
-Characteristics:
+Refresh tokens are used to obtain a new access token after the current access token expires.
 
-- Longer validity than the Access Token
-- Stored securely by the client
-- Used only with the Refresh Token endpoint
-- Never sent with normal API requests
+Each refresh token is associated with a persisted authentication session.
+
+### Session Persistence
+
+The Authentication Module stores refresh-token session state in the:
+
+```text
+authentication_sessions
+```
+
+collection.
+
+The persisted session contains the following fields:
+
+| Field              | Purpose                            |
+| ------------------ | ---------------------------------- |
+| `userId`           | Identifies the associated User     |
+| `refreshTokenHash` | Stores a hash of the refresh token |
+| `expiresAt`        | Defines when the session expires   |
+| `revokedAt`        | Records session revocation         |
+
+### Refresh Token Storage
+
+The raw refresh token is **not** stored in the database.
+
+Before persistence, the refresh token is hashed using **SHA-256**, and the resulting value is stored as `refreshTokenHash`.
+
+```text
+Refresh Token
+      │
+      ▼
+  SHA-256 Hash
+      │
+      ▼
+refreshTokenHash
+      │
+      ▼
+authentication_sessions
+```
+
+### Session Lifecycle
+
+An authentication session has the following lifecycle states:
+
+```text
+Created
+   │
+   ├── Active until expiresAt
+   │
+   ├── Revoked through revokedAt
+   │
+   └── Expired after expiresAt
+```
+
+Refresh-token operations must verify both the supplied token and its associated persisted session before issuing a new access token.
+
+Authentication session creation, validation, and lifecycle management are owned by the **Authentication Module**.
 
 ## 4.7 Authorization
 

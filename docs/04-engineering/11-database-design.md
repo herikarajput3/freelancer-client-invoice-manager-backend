@@ -163,7 +163,7 @@ These assumptions establish the architectural boundaries within which the databa
 
 ## 3.4 Aggregate Model
 
-The database consists of the following Aggregate Roots:
+The database consists of the following business Aggregate Roots:
 
 | Aggregate Root    | Primary Collection   | Primary Responsibility                                              |
 | ----------------- | -------------------- | ------------------------------------------------------------------- |
@@ -177,6 +177,15 @@ The database consists of the following Aggregate Roots:
 | Timeline Event    | `timeline_events`    | Immutable business activity history                                 |
 
 Each Aggregate Root owns its business data and is responsible for enforcing all associated business rules.
+
+Authentication persistence is maintained separately from the business Aggregate Root inventory:
+
+| Authentication Collection | Responsibility |
+| ------------------------- | -------------- |
+| `users`                   | User account identity and authentication credentials |
+| `authentication_sessions` | Persisted refresh-token sessions and session lifecycle state |
+
+The Authentication Module owns both collections and is responsible for their creation, modification, and lifecycle management.
 
 ## 3.5 Collection Dependency Overview
 
@@ -340,14 +349,16 @@ Only the Business Profile module may create or modify documents in this collecti
 
 #### Invoice Defaults
 
-| Field                |
-| -------------------- |
-| currency             |
-| paymentTerms         |
-| defaultNotes         |
-| defaultTaxRate       |
-| numbering.prefix     |
-| numbering.nextNumber |
+```text
+invoiceDefaults
+├── currency
+├── paymentTerms
+├── defaultNotes
+├── defaultTaxRate
+└── numbering
+    ├── prefix
+    └── nextNumber
+```
 
 ### References
 
