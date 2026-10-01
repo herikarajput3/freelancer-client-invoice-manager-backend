@@ -8,10 +8,15 @@ const createSession = async (sessionData, options = {}) => {
     return session;
 };
 
-const findByRefreshTokenHash = (refreshTokenHash) =>
-    AuthenticationSession.findOne({ refreshTokenHash }).select(
-        "+refreshTokenHash",
-    );
+const findByRefreshTokenHash = (
+    refreshTokenHash,
+    options = {},
+) =>
+    AuthenticationSession.findOne({
+        refreshTokenHash,
+    })
+        .select("+refreshTokenHash")
+        .session(options.session ?? null);
 
 const findActiveSession = (sessionId) =>
     AuthenticationSession.findOne({

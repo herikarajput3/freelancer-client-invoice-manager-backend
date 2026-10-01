@@ -6,7 +6,7 @@ const createUser = async (userData, options = {}) => {
 };
 const findByEmail = (email, options = {}) =>
     User.findOne({
-        email: email.toLowerCase(),
+        email: email.trim().toLowerCase(),
     })
         .select("+passwordHash")
         .session(options.session ?? null);
