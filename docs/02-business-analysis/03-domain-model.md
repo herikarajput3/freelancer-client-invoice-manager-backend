@@ -36,7 +36,7 @@ that require attention, such as overdue invoices or upcoming reminders.
 
 ### Ownership Hierarchy
 
-The MVP uses the following ownership hierarchy:
+The conceptual ownership hierarchy is:
 
 User
   ↓
@@ -46,9 +46,16 @@ Business Profile
   ↓
 Business Data
 
-Each User operates one Workspace.
-Each Workspace contains one Business Profile.
+For the MVP, the Workspace is an implicit ownership boundary and is
+represented by the User → Business Profile relationship rather than
+as a separate persisted entity.
+
+Each User operates one logical Workspace.
+Each logical Workspace contains one Business Profile.
 Business records belong to the Business Profile within that Workspace.
+
+A persisted Workspace entity is intentionally deferred until
+multi-user workspace support is introduced.
 
 ## Business Relationships
 
