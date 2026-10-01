@@ -9,12 +9,14 @@ const generateAccessToken = (payload) =>
 
 const generateRefreshToken = (payload) =>
     jwt.sign(payload, config.jwt.secret, {
+        algorithm: "HS256",
         expiresIn: config.jwt.refreshExpiresIn,
     });
 
 const verifyAccessToken = (token) =>
-    jwt.verify(token, config.jwt.secret);
-
+    jwt.verify(token, config.jwt.secret, {
+        algorithms: ["HS256"],
+    });
 const verifyRefreshToken = (token) =>
     jwt.verify(token, config.jwt.secret);
 

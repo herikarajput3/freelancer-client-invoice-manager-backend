@@ -17,11 +17,20 @@ const envSchema = z.object({
         .trim()
         .min(1, "MONGODB_URI is required"),
 
-    JWT_SECRET: z.string().optional(),
+    JWT_SECRET: z
+        .string()
+        .trim()
+        .min(32, "JWT_SECRET must be at least 32 characters"),
 
-    JWT_ACCESS_EXPIRES_IN: z.string().optional(),
+    JWT_ACCESS_EXPIRES_IN: z
+        .string()
+        .trim()
+        .min(1, "JWT_ACCESS_EXPIRES_IN is required"),
 
-    JWT_REFRESH_EXPIRES_IN: z.string().optional(),
+    JWT_REFRESH_EXPIRES_IN: z
+        .string()
+        .trim()
+        .min(1, "JWT_REFRESH_EXPIRES_IN is required"),
 
     CORS_ORIGIN: z.string().optional(),
 });
