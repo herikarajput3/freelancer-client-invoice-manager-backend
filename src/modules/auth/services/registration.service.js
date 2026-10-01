@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+import { ConflictError } from "../../../core/shared/errors/index.js";
 import businessProfileService from "../../business-profile/services/business-profile.service.js";
 import authenticationSessionRepository from "../repositories/authentication-session.repository.js";
 import userRepository from "../repositories/user.repository.js";
@@ -25,13 +26,10 @@ const register = async ({
                 );
 
             if (existingUser) {
-                const error = new Error(
+                throw new ConflictError(
                     "An account with this email already exists.",
+                    "USER_ALREADY_EXISTS",
                 );
-
-                error.code = "USER_ALREADY_EXISTS";
-
-                throw error;
             }
 
             const passwordHash =
@@ -97,7 +95,21 @@ const register = async ({
         });
 
         return registrationResult;
-    } finally {
+    }
+    catch (error) {
+        if (
+            error?.code === 11000 &&
+            error?.keyPattern?.email
+        ) {
+            throw new ConflictError(
+                "An account with this email already exists.",
+                "USER_ALREADY_EXISTS",
+            );
+        }
+
+        throw error;
+    }
+    finally {
         await session.endSession();
     }
 };

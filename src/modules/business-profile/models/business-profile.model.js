@@ -147,7 +147,6 @@ const businessProfileSchema = new mongoose.Schema(
 
         ownerName: {
             type: String,
-            required: true,
             trim: true,
         },
 
@@ -180,12 +179,10 @@ const businessProfileSchema = new mongoose.Schema(
 
         address: {
             type: addressSchema,
-            required: true,
         },
 
         branding: {
             type: brandingSchema,
-            required: true,
         },
 
         bankDetails: {
@@ -194,7 +191,6 @@ const businessProfileSchema = new mongoose.Schema(
 
         invoiceDefaults: {
             type: invoiceDefaultsSchema,
-            required: true,
         },
 
         archivedAt: {

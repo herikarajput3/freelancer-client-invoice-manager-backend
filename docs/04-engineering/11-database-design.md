@@ -302,16 +302,16 @@ Only the Business Profile module may create or modify documents in this collecti
 | `schemaVersion`      | Number   | Yes      | Document schema version       |
 | `businessName`       | String   | Yes      | Display name of the business  |
 | `legalName`          | String   | No       | Registered legal name         |
-| `ownerName`          | String   | Yes      | Business owner's name         |
+| `ownerName`          | String   | No      | Business owner's name         |
 | `email`              | String   | Yes      | Primary business email        |
 | `phone`              | String   | No       | Contact number                |
 | `website`            | String   | No       | Business website              |
 | `taxNumber`          | String   | No       | Tax/GST identifier            |
 | `registrationNumber` | String   | No       | Business registration number  |
-| `address`            | Object   | Yes      | Business address              |
-| `branding`           | Object   | Yes      | Logo and brand settings       |
+| `address`            | Object   | No      | Business address              |
+| `branding`           | Object   | No      | Logo and brand settings       |
 | `bankDetails`        | Object   | No       | Payment information           |
-| `invoiceDefaults`    | Object   | Yes      | Default invoice configuration |
+| `invoiceDefaults`    | Object   | No      | Default invoice configuration |
 | `createdAt`          | Date     | Yes      | Creation timestamp            |
 | `updatedAt`          | Date     | Yes      | Last update timestamp         |
 | `archivedAt`         | Date     | No       | Archive timestamp             |
