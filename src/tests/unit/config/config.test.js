@@ -11,6 +11,9 @@ describe("configuration", () => {
             NODE_ENV: "test",
             PORT: "5000",
             MONGODB_URI: "mongodb://localhost:27017/test",
+            JWT_SECRET: "test-jwt-secret-that-is-at-least-32-characters-long",
+            JWT_ACCESS_EXPIRES_IN: "15m",
+            JWT_REFRESH_EXPIRES_IN: "7d",
         };
     });
 
