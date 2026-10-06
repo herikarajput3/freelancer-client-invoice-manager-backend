@@ -10,12 +10,20 @@ vi.mock(
     () => ({
         default: {
             register: vi.fn(),
+            login: vi.fn(),
         },
     }),
 );
 
 vi.mock(
     "../../../modules/auth/validators/registration.validator.js",
+    () => ({
+        default: {},
+    }),
+);
+
+vi.mock(
+    "../../../modules/auth/validators/login.validator.js",
     () => ({
         default: {},
     }),
@@ -46,6 +54,24 @@ describe("Auth Routes", () => {
 
         expect(
             registrationRoute.route.stack.length,
+        ).toBeGreaterThanOrEqual(2);
+    });
+
+    it("defines the login POST route", () => {
+        const loginRoute =
+            authRoutes.stack.find(
+                (layer) =>
+                    layer.route?.path === "/login",
+            );
+
+        expect(loginRoute).toBeDefined();
+
+        expect(
+            loginRoute.route.methods.post,
+        ).toBe(true);
+
+        expect(
+            loginRoute.route.stack.length,
         ).toBeGreaterThanOrEqual(2);
     });
 });
