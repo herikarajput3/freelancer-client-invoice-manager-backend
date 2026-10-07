@@ -172,4 +172,108 @@ describe("Login Service", () => {
             refreshToken: "refresh-token",
         });
     });
+
+    it("rejects login when email does not exist", async () => {
+        mocks.findByEmail.mockResolvedValue(null);
+
+        await expect(
+            loginService.login({
+                email: "unknown@example.com",
+                password: "securepassword",
+            }),
+        ).rejects.toMatchObject({
+            statusCode: 401,
+            code: "INVALID_CREDENTIALS",
+            message: "Invalid email or password.",
+        });
+
+        expect(
+            mocks.comparePassword,
+        ).not.toHaveBeenCalled();
+
+        expect(
+            mocks.generateAccessToken,
+        ).not.toHaveBeenCalled();
+
+        expect(
+            mocks.generateRefreshToken,
+        ).not.toHaveBeenCalled();
+
+        expect(
+            mocks.createSession,
+        ).not.toHaveBeenCalled();
+    });
+
+    it("rejects login when password is incorrect", async () => {
+        mocks.comparePassword.mockResolvedValue(false);
+
+        await expect(
+            loginService.login({
+                email: "freelancer@example.com",
+                password: "wrongpassword",
+            }),
+        ).rejects.toMatchObject({
+            statusCode: 401,
+            code: "INVALID_CREDENTIALS",
+            message: "Invalid email or password.",
+        });
+
+        expect(
+            mocks.findByEmail,
+        ).toHaveBeenCalledWith(
+            "freelancer@example.com",
+        );
+
+        expect(
+            mocks.comparePassword,
+        ).toHaveBeenCalledWith(
+            "wrongpassword",
+            "hashed-password",
+        );
+
+        expect(
+            mocks.generateAccessToken,
+        ).not.toHaveBeenCalled();
+
+        expect(
+            mocks.generateRefreshToken,
+        ).not.toHaveBeenCalled();
+
+        expect(
+            mocks.createSession,
+        ).not.toHaveBeenCalled();
+    });
+
+    it("propagates user repository errors", async () => {
+        const databaseError = new Error(
+            "Database connection failed",
+        );
+
+        mocks.findByEmail.mockRejectedValue(
+            databaseError,
+        );
+
+        await expect(
+            loginService.login({
+                email: "freelancer@example.com",
+                password: "securepassword",
+            }),
+        ).rejects.toBe(databaseError);
+
+        expect(
+            mocks.comparePassword,
+        ).not.toHaveBeenCalled();
+
+        expect(
+            mocks.generateAccessToken,
+        ).not.toHaveBeenCalled();
+
+        expect(
+            mocks.generateRefreshToken,
+        ).not.toHaveBeenCalled();
+
+        expect(
+            mocks.createSession,
+        ).not.toHaveBeenCalled();
+    });
 });
