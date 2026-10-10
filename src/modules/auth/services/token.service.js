@@ -2,23 +2,69 @@ import jwt from "jsonwebtoken";
 
 import config from "../../../core/config/index.js";
 
+const JWT_ALGORITHM = "HS256";
+
 const generateAccessToken = (payload) =>
-    jwt.sign(payload, config.jwt.secret, {
-        expiresIn: config.jwt.accessExpiresIn,
-    });
+    jwt.sign(
+        {
+            ...payload,
+            tokenType: "access",
+        },
+        config.jwt.secret,
+        {
+            algorithm: JWT_ALGORITHM,
+            expiresIn: config.jwt.accessExpiresIn,
+        },
+    );
 
 const generateRefreshToken = (payload) =>
-    jwt.sign(payload, config.jwt.secret, {
-        algorithm: "HS256",
-        expiresIn: config.jwt.refreshExpiresIn,
-    });
+    jwt.sign(
+        {
+            ...payload,
+            tokenType: "refresh",
+        },
+        config.jwt.secret,
+        {
+            algorithm: JWT_ALGORITHM,
+            expiresIn: config.jwt.refreshExpiresIn,
+        },
+    );
 
-const verifyAccessToken = (token) =>
-    jwt.verify(token, config.jwt.secret, {
-        algorithms: ["HS256"],
-    });
-const verifyRefreshToken = (token) =>
-    jwt.verify(token, config.jwt.secret);
+const verifyAccessToken = (token) => {
+    const payload = jwt.verify(
+        token,
+        config.jwt.secret,
+        {
+            algorithms: [JWT_ALGORITHM],
+        },
+    );
+
+    if (payload?.tokenType !== "access") {
+        throw new jwt.JsonWebTokenError(
+            "Invalid access token type.",
+        );
+    }
+
+    return payload;
+};
+
+const verifyRefreshToken = (token) => {
+    const payload = jwt.verify(
+        token,
+        config.jwt.secret,
+        {
+            algorithms: [JWT_ALGORITHM],
+        },
+    );
+
+    if (payload?.tokenType !== "refresh") {
+        throw new jwt.JsonWebTokenError(
+            "Invalid refresh token type.",
+        );
+    }
+
+    return payload;
+};
 
 const getTokenExpirationDate = (token) => {
     const decodedToken = jwt.decode(token);
