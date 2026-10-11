@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import { UnauthorizedError } from "../../../core/shared/errors/index.js";
 import authenticationSessionRepository from "../repositories/authentication-session.repository.js";
 import sessionTokenService from "./session-token.service.js";
@@ -31,41 +33,83 @@ const refreshAccessToken = async (refreshToken) => {
         throwInvalidRefreshToken();
     }
 
-    const refreshTokenHash =
-        sessionTokenService.hashSessionToken(refreshToken);
+    if (
+        !mongoose.isValidObjectId(payload.sessionId) ||
+        typeof payload.userId !== "string"
+    ) {
+        throwInvalidRefreshToken();
+    }
 
     const session =
-        await authenticationSessionRepository.findByRefreshTokenHash(
-            refreshTokenHash,
-        );
+        await authenticationSessionRepository
+            .findByIdWithRefreshTokenHash(payload.sessionId);
 
     if (!session) {
         throwInvalidRefreshToken();
     }
 
+    const now = Date.now();
+
     const sessionIsExpired =
         !(session.expiresAt instanceof Date) ||
         Number.isNaN(session.expiresAt.getTime()) ||
-        session.expiresAt.getTime() <= Date.now();
+        session.expiresAt.getTime() <= now;
 
-    const sessionIsRevoked = session.revokedAt != null;
+    if (session.revokedAt != null || sessionIsExpired) {
+        throwInvalidRefreshToken();
+    }
 
-    const userId = session.userId?.toString();
+    if (session.userId.toString() !== payload.userId) {
+        throwInvalidRefreshToken();
+    }
 
-    if (
-        sessionIsExpired ||
-        sessionIsRevoked ||
-        !userId ||
-        payload.userId !== userId
-    ) {
+    const currentRefreshTokenHash =
+        sessionTokenService.hashSessionToken(refreshToken);
+
+    if (session.refreshTokenHash !== currentRefreshTokenHash) {
+        await authenticationSessionRepository.revokeSession(
+            session._id,
+        );
+
+        throwInvalidRefreshToken();
+    }
+
+    const nextRefreshToken = tokenService.generateRefreshToken({
+        userId: payload.userId,
+        sessionId: session._id.toString(),
+    });
+
+    const nextRefreshTokenHash =
+        sessionTokenService.hashSessionToken(nextRefreshToken);
+
+    const expiresAt =
+        tokenService.getTokenExpirationDate(nextRefreshToken);
+
+    const rotatedSession =
+        await authenticationSessionRepository.rotateSession({
+            sessionId: session._id,
+            currentRefreshTokenHash,
+            nextRefreshTokenHash,
+            expiresAt,
+        });
+
+    if (!rotatedSession) {
+        // The token may have been used again after our initial lookup.
+        await authenticationSessionRepository.revokeSession(
+            session._id,
+        );
+
         throwInvalidRefreshToken();
     }
 
     const accessToken = tokenService.generateAccessToken({
-        userId,
+        userId: payload.userId,
     });
 
-    return { accessToken };
+    return {
+        accessToken,
+        refreshToken: nextRefreshToken,
+    };
 };
 
 const refreshTokenService = {

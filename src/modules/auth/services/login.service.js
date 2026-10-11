@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { UnauthorizedError, } from "../../../core/shared/errors/index.js";
 import userRepository from "../repositories/user.repository.js";
 import authenticationSessionRepository from "../repositories/authentication-session.repository.js";
@@ -41,10 +42,13 @@ const login = async ({
             userId: user._id.toString(),
         });
 
-    const refreshTokenHash =
-        sessionTokenService.hashSessionToken(
-            refreshToken,
-        );
+    const sessionId = new mongoose.Types.ObjectId();
+
+    const refreshToken =
+        tokenService.generateRefreshToken({
+            userId: user._id.toString(),
+            sessionId: sessionId.toString(),
+        });
 
     const expireAt =
         tokenService.getTokenExpirationDate(
@@ -52,6 +56,7 @@ const login = async ({
         );
 
     await authenticationSessionRepository.createSession({
+        _id: sessionId,
         userId: user._id.toString(),
         refreshTokenHash,
         expiresAt: expireAt,

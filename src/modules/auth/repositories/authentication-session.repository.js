@@ -32,11 +32,42 @@ const revokeSession = (sessionId) =>
         { new: true },
     );
 
+const findByIdWithRefreshTokenHash = (sessionId) =>
+    AuthenticationSession.findById(sessionId)
+        .select("+refreshTokenHash");
+
+const rotateSession = async ({
+    sessionId,
+    currentRefreshTokenHash,
+    nextRefreshTokenHash,
+    expiresAt,
+}) =>
+    AuthenticationSession.findOneAndUpdate(
+        {
+            _id: sessionId,
+            refreshTokenHash: currentRefreshTokenHash,
+            revokedAt: null,
+            expiresAt: { $gt: new Date() },
+        },
+        {
+            $set: {
+                refreshTokenHash: nextRefreshTokenHash,
+                expiresAt,
+            },
+        },
+        {
+            new: true,
+            runValidators: true,
+        },
+    );
+
 const authenticationSessionRepository = {
     createSession,
     findByRefreshTokenHash,
     findActiveSession,
     revokeSession,
+    findByIdWithRefreshTokenHash,
+    rotateSession,
 };
 
 export default authenticationSessionRepository;
