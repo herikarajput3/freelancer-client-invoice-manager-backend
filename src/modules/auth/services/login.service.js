@@ -6,6 +6,7 @@ import passwordService from "./password.service.js";
 import tokenService from "./token.service.js";
 import sessionTokenService from "./session-token.service.js";
 
+
 const login = async ({
     email,
     password,
@@ -37,11 +38,6 @@ const login = async ({
             userId: user._id.toString(),
         });
 
-    const refreshToken =
-        tokenService.generateRefreshToken({
-            userId: user._id.toString(),
-        });
-
     const sessionId = new mongoose.Types.ObjectId();
 
     const refreshToken =
@@ -49,6 +45,9 @@ const login = async ({
             userId: user._id.toString(),
             sessionId: sessionId.toString(),
         });
+
+    const refreshTokenHash =
+        sessionTokenService.hashSessionToken(refreshToken);
 
     const expireAt =
         tokenService.getTokenExpirationDate(

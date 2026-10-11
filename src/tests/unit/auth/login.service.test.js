@@ -136,6 +136,7 @@ describe("Login Service", () => {
             mocks.generateRefreshToken,
         ).toHaveBeenCalledWith({
             userId: "user-id",
+            sessionId: expect.any(String),
         });
 
         expect(
@@ -153,6 +154,7 @@ describe("Login Service", () => {
         expect(
             mocks.createSession,
         ).toHaveBeenCalledWith({
+            _id: expect.anything(), 
             userId: "user-id",
             refreshTokenHash:
                 "refresh-token-hash",
