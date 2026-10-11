@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import tokenService from "../../modules/auth/services/token.service.js";
 import { UnauthorizedError } from "../shared/errors/index.js";
 
