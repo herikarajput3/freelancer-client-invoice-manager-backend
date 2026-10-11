@@ -20,6 +20,17 @@ vi.mock(
     }),
 );
 
+vi.mock(
+    "../../../src/modules/auth/services/token.service.js",
+    () => ({
+        default: {
+            getTokenExpirationDate: vi.fn(
+                () => new Date("2026-12-31T00:00:00.000Z"),
+            ),
+        },
+    }),
+);
+
 const { default: app } = await import("../../app.js");
 
 describe("POST /api/v1/auth/login", () => {
@@ -56,7 +67,10 @@ describe("POST /api/v1/auth/login", () => {
         expect(response.body).toEqual({
             success: true,
             message: "Login successful",
-            data: loginResult,
+            data: {
+                user: loginResult.user,
+                accessToken: loginResult.accessToken,
+            },
         });
 
         expect(mocks.login).toHaveBeenCalledWith(

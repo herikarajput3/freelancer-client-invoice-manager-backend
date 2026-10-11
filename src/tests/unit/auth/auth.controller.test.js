@@ -12,6 +12,17 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock(
+    "../../../modules/auth/services/token.service.js",
+    () => ({
+        default: {
+            getTokenExpirationDate: vi.fn(() =>
+                new Date("2026-12-31T00:00:00.000Z"),
+            ),
+        },
+    }),
+);
+
+vi.mock(
     "../../../modules/auth/services/registration.service.js",
     () => ({
         default: {
@@ -58,7 +69,10 @@ describe("Auth Controller", () => {
             },
         };
 
-        const res = {};
+        const res = {
+            cookie: vi.fn(),
+        };
+
         const next = vi.fn();
 
         mocks.register.mockResolvedValue(
@@ -77,7 +91,10 @@ describe("Auth Controller", () => {
                 statusCode: 201,
                 success: true,
                 message: "Registration successful",
-                data: registrationResult,
+                data: {
+                    user: registrationResult.user,
+                    accessToken: registrationResult.accessToken,
+                },
             },
         );
 
