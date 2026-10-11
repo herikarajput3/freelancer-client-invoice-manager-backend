@@ -13,9 +13,17 @@ const mocks = vi.hoisted(() => ({
     getTokenExpirationDate: vi.fn(),
 }));
 
+
 vi.mock("mongoose", () => ({
     default: {
         startSession: mocks.startSession,
+        Types: {
+            ObjectId: class MockObjectId {
+                toString() {
+                    return "session-id";
+                }
+            },
+        },
     },
 }));
 
@@ -176,6 +184,7 @@ describe("Registration Service", () => {
 
         expect(mocks.createSession).toHaveBeenCalledWith(
             {
+                _id: expect.anything(),
                 userId: "user-id",
                 refreshTokenHash:
                     "refresh-token-hash",

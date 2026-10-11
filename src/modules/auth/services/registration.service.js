@@ -54,6 +54,8 @@ const register = async ({
                 { session },
             );
 
+            const sessionId = new mongoose.Types.ObjectId();
+
             const accessToken =
                 tokenService.generateAccessToken({
                     userId: user._id.toString(),
@@ -62,6 +64,7 @@ const register = async ({
             const refreshToken =
                 tokenService.generateRefreshToken({
                     userId: user._id.toString(),
+                    sessionId: sessionId.toString(),
                 });
 
             const refreshTokenHash =
@@ -76,6 +79,7 @@ const register = async ({
 
             await authenticationSessionRepository.createSession(
                 {
+                    _id: sessionId,
                     userId: user._id,
                     refreshTokenHash,
                     expiresAt,
