@@ -11,6 +11,7 @@ vi.mock(
         default: {
             register: vi.fn(),
             login: vi.fn(),
+            refresh: vi.fn(),
         },
     }),
 );
