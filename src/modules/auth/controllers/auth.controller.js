@@ -59,7 +59,6 @@ const login = async (req, res, next) => {
             message: "Login successful",
         });
     } catch (error) {
-        console.log("login error", error);
         return next(error);
     }
 };

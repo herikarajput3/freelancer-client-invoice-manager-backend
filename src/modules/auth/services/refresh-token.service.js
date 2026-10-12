@@ -34,8 +34,11 @@ const refreshAccessToken = async (refreshToken) => {
     }
 
     if (
+        !payload ||
+        typeof payload !== "object" ||
         !mongoose.isValidObjectId(payload.sessionId) ||
-        typeof payload.userId !== "string"
+        typeof payload.userId !== "string" ||
+        !payload.userId.trim()
     ) {
         throwInvalidRefreshToken();
     }
@@ -84,6 +87,10 @@ const refreshAccessToken = async (refreshToken) => {
 
     const expiresAt =
         tokenService.getTokenExpirationDate(nextRefreshToken);
+
+    const accessToken = tokenService.generateAccessToken({
+        userId: payload.userId,
+    });
 
     const rotatedSession =
         await authenticationSessionRepository.rotateSession({
