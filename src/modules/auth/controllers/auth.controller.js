@@ -3,6 +3,7 @@ import loginService from "../services/login.service.js";
 import sendResponse from "../../../core/responses/sendResponse.js";
 import config from "../../../core/config/index.js";
 import tokenService from "../services/token.service.js";
+import refreshTokenService from "../services/refresh-token.service.js";
 
 const REFRESH_TOKEN_COOKIE = "refreshToken";
 
@@ -63,9 +64,40 @@ const login = async (req, res, next) => {
     }
 };
 
+
+const refresh = async (req, res, next) => {
+    try {
+        const refreshToken = req.cookies?.refreshToken;
+
+        const result =
+            await refreshTokenService.refreshAccessToken(
+                refreshToken,
+            );
+
+        res.cookie(
+            REFRESH_TOKEN_COOKIE,
+            result.refreshToken,
+            getRefreshTokenCookieOptions(result.refreshToken),
+        );
+
+        return sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: "Access token refreshed successfully",
+            data: {
+                accessToken: result.accessToken,
+            },
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
+
 const authController = {
     register,
     login,
+    refresh,
 };
 
 export default authController;

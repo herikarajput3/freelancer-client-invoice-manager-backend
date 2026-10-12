@@ -4,10 +4,12 @@ import mongoose from "mongoose";
 import authRoutes from "./modules/auth/routes/auth.routes.js";
 import errorHandler from "./core/middlewares/errorHandler.js";
 import notFound from "./core/middlewares/notFound.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/health", (req, res) => {
     const databaseHealthy =
