@@ -75,4 +75,17 @@ describe("Auth Routes", () => {
             loginRoute.route.stack.length,
         ).toBeGreaterThanOrEqual(2);
     });
+
+
+    it("defines the refresh POST route", () => {
+        const refreshRoute = authRoutes.stack.find(
+            (layer) => layer.route?.path === "/refresh",
+        );
+
+        expect(refreshRoute).toBeDefined();
+        expect(refreshRoute.route.methods.post).toBe(true);
+
+        expect(refreshRoute.route.stack).toHaveLength(1);
+    });
+
 });
