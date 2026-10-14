@@ -109,10 +109,6 @@ const refreshAccessToken = async (refreshToken) => {
         throwInvalidRefreshToken();
     }
 
-    const accessToken = tokenService.generateAccessToken({
-        userId: payload.userId,
-    });
-
     return {
         accessToken,
         refreshToken: nextRefreshToken,
