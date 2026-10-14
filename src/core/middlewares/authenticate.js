@@ -35,7 +35,7 @@ const authenticate = (req, res, next) => {
         if (
             typeof payload !== "object" ||
             typeof payload.userId !== "string" ||
-            !payload.userId
+            !payload.userId.trim()
         ) {
             return next(
                 new UnauthorizedError(
