@@ -50,5 +50,16 @@ describe("Token Service", () => {
                 tokenService.verifyAccessToken(tamperedToken),
             ).toThrow();
         });
+
+        it("rejects a refresh token when verifying an access token", () => {
+            const refreshToken = tokenService.generateRefreshToken({
+                ...payload,
+                sessionId: "507f1f77bcf86cd799439012",
+            });
+
+            expect(() =>
+                tokenService.verifyAccessToken(refreshToken),
+            ).toThrow("Invalid access token type.");
+        });
     });
 });
