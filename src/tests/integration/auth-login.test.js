@@ -73,6 +73,20 @@ describe("POST /api/v1/auth/login", () => {
             },
         });
 
+        const setCookie = response.headers["set-cookie"];
+
+        expect(setCookie).toBeDefined();
+
+        const refreshCookie = setCookie.find((cookie) =>
+            cookie.startsWith("refreshToken="),
+        );
+
+        expect(refreshCookie).toBeDefined();
+        expect(refreshCookie).toContain("HttpOnly");
+        expect(refreshCookie).toContain("SameSite=Lax");
+        expect(refreshCookie).toContain("Path=/api/v1/auth");
+        expect(refreshCookie).toContain("refreshToken=refresh-token");
+
         expect(mocks.login).toHaveBeenCalledWith(
             loginData,
         );
